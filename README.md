@@ -1,7 +1,7 @@
 # EF-Calib: Spatiotemporal Calibration of Event- and Frame-Based Cameras Using Continuous-Time Trajectories
 
-<center>
+<div align=center>
     <img src="./asset/overview.png" alt="overview image" width="400">
-</center>
+</div>
 
 The code will be open-sourced upon acceptance of the paper.
