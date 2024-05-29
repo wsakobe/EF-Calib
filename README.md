@@ -4,4 +4,4 @@
     <img src="./asset/overview.png" alt="overview image" width="400">
 </div>
 
-The code will be open-sourced upon acceptance of the paper.
+The code will be released soon.
