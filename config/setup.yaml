@@ -1,0 +1,27 @@
+## Board size
+BoardWidth: 6
+BoardHeight: 3
+
+## Bag config
+BagName: "../record_bag/trial_sync_1.bag"
+StorePath: "../record_bag/"
+cornerBagPath: "record_bag/corner_info.bag"   
+circleBagPath: "../record_bag/circle_info.bag"
+
+## Estimator config
+log_path: /data/EV-Calib/logs
+init_window_size: 3
+
+conv_cam_width: 1280
+conv_cam_height: 1024
+ev_cam_width: 346
+ev_cam_height: 260
+
+square_size: 40 # unit:mm
+board_width: 6
+board_height: 3
+
+knot_distance: 0.035
+continue_number: 15
+
+opt_time: 40

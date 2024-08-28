@@ -1,0 +1,10 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/data/catkin_calib/devel/lib/python2.7/dist-packages",
+        "/opt/ros/melodic/lib/python2.7/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/data/catkin_calib/devel/lib/python2.7/dist-packages",
+        "/opt/ros/melodic/lib/python2.7/dist-packages"
+    ]
+}

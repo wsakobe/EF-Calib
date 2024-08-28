@@ -1,0 +1,7 @@
+<launch>
+    <arg name="config_path" default = "../config/setup.yaml" />
+    
+    <node pkg="estimator" type="estimator" name="estimator" respawn="false" output="screen"> 
+        <param name="config_path"     type="string" value="$(find estimator)$(arg config_path)" />
+    </node>
+</launch>

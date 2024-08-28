@@ -1,0 +1,30 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/data/catkin_calib/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/data/catkin_calib/src/EF-Calib/circle_detector/include/**",
+        "/data/catkin_calib/src/EF-Calib/corner_detector/include/**",
+        "/data/catkin_calib/src/EF-Calib/rpg_dvs_ros/davis_ros_driver/include/**",
+        "/data/catkin_calib/src/EF-Calib/rpg_dvs_ros/dvs_calibration/include/**",
+        "/data/catkin_calib/src/EF-Calib/rpg_dvs_ros/dvs_renderer/include/**",
+        "/data/catkin_calib/src/EF-Calib/rpg_dvs_ros/dvs_ros_driver/include/**",
+        "/data/catkin_calib/src/EF-Calib/rpg_dvs_ros/dvxplorer_ros_driver/include/**",
+        "/data/catkin_calib/src/EF-Calib/estimator/include/**",
+        "/data/catkin_calib/src/EF-Calib/eventmap_generator/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

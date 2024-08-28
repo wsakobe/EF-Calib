@@ -1,0 +1,4 @@
+<launch>
+    <rosparam file="$(find eventmap_generator)/../config/setup.yaml" command="load"/>
+    <node pkg="eventmap_generator" type="generator" name="generator" respawn="false" output="screen"/> 
+</launch>
