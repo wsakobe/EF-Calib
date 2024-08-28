@@ -34,8 +34,8 @@ You should have created a catkin workspace in Driver Installation. If not, pleas
 
 Clone this repository into the `src` folder of your catkin workspace.
 
-	$ cd ~/catkin_ws/src 
-	$ git clone https://github.com/wsakobe/EF-Calib.git
+    $ cd ~/catkin_ws/src 
+    $ git clone https://github.com/wsakobe/EF-Calib.git
 
 Build all the packages of EF-Calib.
 
@@ -48,15 +48,20 @@ First, record the image data and event streams synchronized according to the met
 
 Configure parameters in the `config/setup.yaml` file.
 
-  - `log_path`: the path to log 
-  - `config_path`: the path of `config` folder 
-  - `bag_path`: the file path of rosbag  
+  - `BagName`: File path of the recorded rosbag
+  - `square_size`: Adjacent feature spacing on the calibration board
+  - `init_window_size`: Minimum number of frames required for initialization
+  - `board_width`: Calibration board size (number of features in the width direction)
+  - `board_height`: Calibration board size (number of features in the height direction)
+  - `knot_distance`: B-spline knot spacing
+  - `continue_number`: Minimum number of consecutive B-spline knots
+  - `opt_time`: Total duration of the rosbag
 
 Next, run the following commands to extract feature information into corner_info.bag and circle_info.bag respectively. 
 
-	$ source ../devel/setup.bash
+    $ source ../devel/setup.bash
     $ cd EF-Calib
-	$ ./run.sh
+    $ ./run.sh
 
 Finally, once valid feature bags are obtained, run the `estimator` to complete the calibration process.
 
@@ -79,4 +84,4 @@ For researchers that have leveraged or compared to this work, please cite the fo
 
 # Acknowledgement
 
-The spline module is adapted from [basalt](https://gitlab.com/VladyslavUsenko/basalt-headers). Thanks for the excellent job!
+The B-spline module is adapted from [basalt](https://gitlab.com/VladyslavUsenko/basalt-headers). Thanks for the excellent job!
