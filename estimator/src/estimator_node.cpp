@@ -1,5 +1,5 @@
 /*
- * EV-Calib
+ * EF-Calib
  * Copyright (C) 2023 Shaoan Wang
  *
  * This program is free software: you can redistribute it and/or modify

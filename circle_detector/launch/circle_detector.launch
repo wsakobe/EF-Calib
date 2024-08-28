@@ -1,4 +1,4 @@
 <launch>
     <rosparam file="$(find circle_detector)/../config/setup.yaml" command="load"/>
-    <node pkg="circle_detector" type="circle_detector" name="circle_detector" respawn="false" output="screen"/> 
+    <node pkg="circle_detector" type="circle_detector" name="circle_detector" required = "true" respawn="false" output="screen"/> 
 </launch>

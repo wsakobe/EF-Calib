@@ -1,4 +1,4 @@
 <launch>
     <rosparam file="$(find corner_detector)/../config/setup.yaml" command="load"/>
-    <node pkg="corner_detector" type="corner_detector" name="corner_detector" respawn="false" output="screen"/> 
+    <node pkg="corner_detector" type="corner_detector" name="corner_detector" required = "true" respawn="false" output="screen"/> 
 </launch>
