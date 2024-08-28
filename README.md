@@ -22,7 +22,7 @@ We use catkin tools to build the code. You should have it installed during the d
 
 ### Ceres-solver
 
-Please follow this [link](http://ceres-solver.org/installation.html) to install Ceres-solver. Notice that >2.0.0 may meet some problem due to some changes.
+Please follow this [link](http://ceres-solver.org/installation.html) to install Ceres-solver. Note that versions above 2.0.0 might encounter issues due to some recent changes.
 
 ### OpenCV 4
 
@@ -44,7 +44,7 @@ Build all the packages of EF-Calib.
 
 # Usage
 
-First, record the image data and event data simultaneously.
+First, record the image data and event streams synchronized according to the method described in the paper.
 
 Configure parameters in the `config/setup.yaml` file.
 
@@ -52,13 +52,13 @@ Configure parameters in the `config/setup.yaml` file.
   - `config_path`: the path of `config` folder 
   - `bag_path`: the file path of rosbag  
 
-Then, 
+Next, run the following commands to extract feature information into corner_info.bag and circle_info.bag respectively. 
 
 	$ source ../devel/setup.bash
     $ cd EF-Calib
 	$ ./run.sh
 
-Run the estimator to finish the spatiotemporal calibration procedure.
+Finally, once valid feature bags are obtained, run the `estimator` to complete the calibration process.
 
     $ roslaunch estimator estimator.launch
 
