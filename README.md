@@ -46,6 +46,14 @@ Build all the packages of EF-Calib.
 
 First, record the image data and event data simultaneously.
 
+Configure parameters in the `config/setup.yaml` file.
+
+  - `log_path`: the path to log 
+  - `config_path`: the path of `config` folder 
+  - `bag_path`: the file path of rosbag  
+
+Then, 
+
 	$ source ../devel/setup.bash
     $ cd EF-Calib
 	$ ./run.sh
