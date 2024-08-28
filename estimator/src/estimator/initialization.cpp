@@ -17,10 +17,10 @@ void Initializer::processConv(){
         corner_world_cluster.emplace_back(corner_world);
     }
     rms_conv = cv::calibrateCamera(corner_world_cluster, corner_image_cluster, convent_camera_->image_size_, convCameraMatrix, convDistCoeffs, convRvecs, convTvecs);
-    std::cout << "Conv P: " << convCameraMatrix << std::endl << convDistCoeffs << std::endl << "ReErr: " << rms_conv << std::endl;
+    std::cout << "Frame-based camera: \n Intrinsic: " << convCameraMatrix << "\nDistortion:" << convDistCoeffs << std::endl << "ReErr: " << rms_conv << std::endl;
     
-    if (rms_conv < 0.3){
-        ROS_INFO("Conv cam initial succ");
+    if (rms_conv < 0.5){
+        ROS_INFO("Frame-based camera initial success!");
         convent_camera_->updateIntrinsic(convCameraMatrix, convDistCoeffs);
         b_conv_initialized = true;
     }
@@ -45,10 +45,10 @@ void Initializer::processEv(){
         circle_world_cluster.emplace_back(circle_world);
     }
     rms_ev = cv::calibrateCamera(circle_world_cluster, circle_image_cluster, event_camera_->image_size_, evCameraMatrix, evDistCoeffs, evRvecs, evTvecs);
-    std::cout << " Event P: " << evCameraMatrix << std::endl << evDistCoeffs << std::endl << "ReErr: " << rms_ev << std::endl;
+    std::cout << "Event camera: \n Intrinsic: " << evCameraMatrix << "\nDistortion:" << evDistCoeffs << std::endl << "ReErr: " << rms_ev << std::endl;
    
     if (rms_ev < 0.5){
-        ROS_INFO("Ev cam initial succ");
+        ROS_INFO("Event camera initial success!");
         event_camera_->updateIntrinsic(evCameraMatrix, evDistCoeffs);
         b_ev_initialized = true;
     }
@@ -75,7 +75,6 @@ bool Initializer::solveRelativePose(const corner_msgs::cornerArray& features, Ca
     cv::Mat_<double> last_row = (cv::Mat_<double>(1, 4) << 0, 0, 0, 1);
     cv::vconcat(Transformation, last_row, Transformation);
 
-    //std::cout << "Conv pose:" << Transformation << std::endl;
     double rep_err = 0.0;
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> RMat, tMat;
     cv::cv2eigen(rotationMat, RMat);
@@ -87,7 +86,6 @@ bool Initializer::solveRelativePose(const corner_msgs::cornerArray& features, Ca
         Eigen::Matrix<double, 2, 1> err = point_in_cam - Eigen::Matrix<double, 2, 1>(corner.x, corner.y);
         rep_err += err.norm();
     }
-    //std::cout << rep_err / features.corners.size() << std::endl;
 
     if (rep_err / features.corners.size() < rms_conv * 3) return true;
     else return false;
@@ -205,8 +203,6 @@ bool Initializer::solveRelativePose(const circle_msgs::circleArray& features, Ca
     cv::Mat_<double> last_row = (cv::Mat_<double>(1, 4) << 0, 0, 0, 1);
     cv::vconcat(Transformation, last_row, Transformation);
 
-    //std::cout << "Event pose:" << Transformation << std::endl;
-
     double rep_err = 0.0;
     Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> RMat, tMat;
     cv::cv2eigen(rotationMat, RMat);
@@ -218,7 +214,6 @@ bool Initializer::solveRelativePose(const circle_msgs::circleArray& features, Ca
         Eigen::Matrix<double, 2, 1> err = point_in_cam - Eigen::Matrix<double, 2, 1>(circle.x, circle.y);
         rep_err += err.norm();
     }
-    //std::cout << rep_err / features.circles.size() << std::endl;
 
     if (rep_err / features.circles.size() < rms_ev * 3) return true;
     else return false;
@@ -250,16 +245,15 @@ void Initializer::estimateInitialExtrinsic(){
                 b_both_initialized = true;
                 min_time_interval = abs(time_gap_min.toSec());
             }
-            
         }
     }
     
     if (!b_both_initialized){
-        ROS_ERROR("Estimate time interval failed, the minimal is: %f", abs(time_gap_min.toSec()));
+        ROS_ERROR("Estimate time interval failed, the minimal time interval is: %f s.", abs(time_gap_min.toSec()));
     }
     else{
         std::cout << "Estimate time interval: " << min_time_interval << std::endl;
-        std::cout << "Extrinsic params guess:\n" << convent_camera_->getExtrinsicMatrix().matrix() << std::endl;
+        std::cout << "Initialized extrinsic params:\n" << convent_camera_->getExtrinsicMatrix().matrix() << std::endl;
     }
     return;
 }

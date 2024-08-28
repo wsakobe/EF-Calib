@@ -49,3 +49,5 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+record_bag/trial_A_3.bag
+.vscode/

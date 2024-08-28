@@ -72,38 +72,40 @@ void EstimatorManager::readBags(std::string corner_bag_path, std::string circle_
 }
 
 void EstimatorManager::performEstimator(){
-    for (est_initializer->epoch_time = 5.0; est_initializer->epoch_time <= opt_time; est_initializer->epoch_time += 0.5){
-        est_initializer->b_conv_initialized = false;
-        est_initializer->b_ev_initialized = false;
-        est_initializer->b_both_initialized = false;
-        if (est_initializer->judgeBufferStatus(CONV_CAM)){
-            est_initializer->processConv();
-        }
-        else{
-            ROS_ERROR("There are no sufficient convent frames for initialization.");
-        }
-        if (est_initializer->judgeBufferStatus(EV_CAM)){
-            est_initializer->processEv();
-        }
-        else{
-            ROS_ERROR("There are no sufficient event frames for initialization.");
-        }
-
-        if (est_initializer->evInitialSucc() && est_initializer->convInitialSucc()){
-            est_initializer->estimateInitialExtrinsic();
-        }
-        else{
-            ROS_ERROR("Initialize error, please record again.");
-            continue;
-        }
-        if (est_initializer->b_both_initialized){
-            clearPreStatus();
-            setInitialState();
-            updateTrajectoryInitial();
-        }
+    est_initializer->epoch_time = opt_time;
+    est_initializer->b_conv_initialized = false;
+    est_initializer->b_ev_initialized = false;
+    est_initializer->b_both_initialized = false;
+    if (est_initializer->judgeBufferStatus(CONV_CAM)){
+        est_initializer->processConv();
     }
-    std::cout << "======================== Finished experiment! =========================\n";
+    else{
+        ROS_ERROR("There are no sufficient convent frames for initialization.");
+    }
+    if (est_initializer->judgeBufferStatus(EV_CAM)){
+        est_initializer->processEv();
+    }
+    else{
+        ROS_ERROR("There are no sufficient event frames for initialization.");
+    }
+
+    if (est_initializer->evInitialSucc() && est_initializer->convInitialSucc()){
+        est_initializer->estimateInitialExtrinsic();
+    }
+    else{
+        ROS_ERROR("Initialize error, please record again.");
+        return;
+    }
+    if (est_initializer->b_both_initialized){
+        clearPreStatus();
+        setInitialState();
+        updateTrajectoryInitial();
+    }
+    
     ros::shutdown();
+
+    std::cout << "================ Finish calibration! =================\n";
+    return;
 }
 
 void EstimatorManager::cornerArrayCallback(const corner_msgs::cornerArray& msg){
@@ -124,7 +126,7 @@ void EstimatorManager::cornerArrayCallback(const corner_msgs::cornerArray& msg){
         init_lc.unlock();
     }
     else{
-        ROS_INFO("Conv add trajectory");
+        ROS_INFO("Frame-based camera add trajectory");
         est_initializer->corner_buffer_.emplace_back(msg);
         performEstimator();
     }    
@@ -141,14 +143,14 @@ void EstimatorManager::circleArrayCallback(const circle_msgs::circleArray& msg){
         }
         else{
             if (est_initializer->convInitialSucc()){
-                ROS_INFO("Both camera initialized");
+                ROS_INFO("Both camera successfully initialized");
                 est_initializer->estimateInitialExtrinsic();
             }        
         }
         init_lc.unlock();
     }
     else{
-        ROS_INFO("Ev add trajectory");
+        ROS_INFO("Event camera add trajectory");
         est_initializer->circle_buffer_.emplace_back(msg);
         performEstimator();
     }    
@@ -191,8 +193,6 @@ void EstimatorManager::updateTrajectoryInitial(){
     corner_used.clear();
     circle_used.clear();
     num_disp_pose = 0;
-
-    std::cout << est_initializer->epoch_time << "\n";
 
     // add circle into trajectory
     for (auto &circles:est_initializer->circle_buffer_){
@@ -338,6 +338,7 @@ void EstimatorManager::updateTrajectoryInitial(){
 
                     se3.setQuaternion(Eigen::Quaterniond(eigenT.block<3,3>(0,0)));
                     se3.translation() = eigenT.block<3,1>(0,3);
+
                     // display corner pose
                     traj_viewer.PublishPose(se3, 1, num_disp_pose++);
                     break;
@@ -351,43 +352,17 @@ void EstimatorManager::updateTrajectoryInitial(){
     Eigen::Vector3d translation_vector = convent_camera_->getExtrinsicMatrix().block<3, 1>(0, 3);
 
     // Output
-    std::cout << "=============== Time offset: " << convent_camera_->time_delay << " =======================\n";
-    std::cout << "Euler angles (XYZ):\n" << euler_angle_ext.transpose() << "\n";
-    std::cout << "Translation vector:\n" << translation_vector.transpose() << "\n";
-    std::cout << "Ev intrinsic:\n" << event_camera_->intrinsicParams[0] << " " << event_camera_->intrinsicParams[1] << " " << event_camera_->intrinsicParams[2] << " " << event_camera_->intrinsicParams[3] << "\n";
-    std::cout << "Conv intrinsic:\n" << convent_camera_->intrinsicParams[0] << " " << convent_camera_->intrinsicParams[1] << " " << convent_camera_->intrinsicParams[2] << " " << convent_camera_->intrinsicParams[3] << "\n";
-    std::cout << "Ev distortion:\n" << event_camera_->distortParams[0] << " " << event_camera_->distortParams[1] << " " << event_camera_->distortParams[2] << " " << event_camera_->distortParams[3] << " " << event_camera_->distortParams[4] << "\n";
-    std::cout << "Conv distortion:\n" << convent_camera_->distortParams[0] << " " << convent_camera_->distortParams[1] << " " << convent_camera_->distortParams[2] << " " << convent_camera_->distortParams[3] << " " << convent_camera_->distortParams[4] << "\n";
-    
-    /*std::ofstream file("/data/EV-Calib/src/estimator/record_data/event_intrinsic.txt", std::ios_base::app);
-    if (file.is_open()) {
-        file << event_camera_->intrinsicParams[0] << " " << event_camera_->intrinsicParams[1] << " " << event_camera_->intrinsicParams[2] << " " << event_camera_->intrinsicParams[3] << " ";
-        file << event_camera_->distortParams[0] << " " << event_camera_->distortParams[1] << " " << event_camera_->distortParams[2] << " " << event_camera_->distortParams[3] << " " << event_camera_->distortParams[4] << std::endl;
-        file.close();
-    }
-    file.open("/data/EV-Calib/src/estimator/record_data/convent_intrinsic.txt", std::ios_base::app);
-    if (file.is_open()) {
-        file << convent_camera_->intrinsicParams[0] << " " << convent_camera_->intrinsicParams[1] << " " << convent_camera_->intrinsicParams[2] << " " << convent_camera_->intrinsicParams[3] << " ";
-        file << convent_camera_->distortParams[0] << " " << convent_camera_->distortParams[1] << " " << convent_camera_->distortParams[2] << " " << convent_camera_->distortParams[3] << " " << convent_camera_->distortParams[4] << std::endl;
-        file.close();
-    }
-    file.open("/data/EV-Calib/src/estimator/record_data/extrinsic.txt", std::ios_base::app);
-    if (file.is_open()) {
-        file << euler_angle_ext.transpose() << " ";
-        file << translation_vector.transpose() << std::endl;
-        file.close();
-    }*/
-    std::ofstream file("/data/EV-Calib/src/estimator/record_data/time_delay.txt", std::ios_base::app);
-    if (file.is_open()) {
-        file << convent_camera_->time_delay << std::endl;
-        file.close();
-    }
-    file.open("/data/EV-Calib/src/estimator/record_data/time.txt", std::ios_base::app);
-    if (file.is_open()) {
-        file << est_initializer->epoch_time << std::endl;
-        file.close();
-    }
-        
+    std::cout << "================== Calibration results: ==================\n\n";
+    std::cout << "Event camera intrinsic parameters:\n" << event_camera_->intrinsicParams[0] << " " << event_camera_->intrinsicParams[1] << " " << event_camera_->intrinsicParams[2] << " " << event_camera_->intrinsicParams[3] << "\n\n";
+    std::cout << "Event camera distortion parameters:\n" << event_camera_->distortParams[0] << " " << event_camera_->distortParams[1] << " " << event_camera_->distortParams[2] << " " << event_camera_->distortParams[3] << " " << event_camera_->distortParams[4] << "\n\n";
+    std::cout << "Frame-based camera intrinsic parameters:\n" << convent_camera_->intrinsicParams[0] << " " << convent_camera_->intrinsicParams[1] << " " << convent_camera_->intrinsicParams[2] << " " << convent_camera_->intrinsicParams[3] << "\n\n";
+    std::cout << "Frame-based distortion parameters:\n" << convent_camera_->distortParams[0] << " " << convent_camera_->distortParams[1] << " " << convent_camera_->distortParams[2] << " " << convent_camera_->distortParams[3] << " " << convent_camera_->distortParams[4] << "\n\n";
+    std::cout << "Extrinsic parameters:\n" << convent_camera_->getExtrinsicMatrix() << "\n\n";
+    std::cout << "Time offset (s):\n" << convent_camera_->time_delay << "\n\n";
+    std::cout << "Euler angles (XYZ):\n" << euler_angle_ext.transpose() << "\n\n";
+    std::cout << "Translation vector (mm):\n" << translation_vector.transpose() << "\n\n";
+
+    /*    
     // Calculate trans and rot error
     std::vector<Eigen::Vector3d> euler_angles, t_rels;
     SE3d pose;
@@ -443,9 +418,8 @@ void EstimatorManager::updateTrajectoryInitial(){
         // file << mean << " " << rep_err_conv.size() << std::endl;
         std::cout << "Trans_err: " << mean << " " << rep_err_conv.size() << std::endl;
         file.close();
-    }
+    }*/
 
-    std::cout << "=================== End for this epoch ====================\n";
 }
 
 void EstimatorManager::calculateRepError(int CAM_TYPE, int tag){

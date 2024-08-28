@@ -47,14 +47,6 @@ public:
         UpdateTrajectoryCallback(TrajectoryEstimator* estimator) : estimator_(estimator) {}
 
         virtual ceres::CallbackReturnType operator()(const ceres::IterationSummary& summary) {
-            // for (auto traj : estimator_->trajectory_info_) {
-            //     estimator_->trajectory_->getKnotPos(traj.first) = estimator_->trajectory_->getKnotPos(traj.first + 1);
-            //     estimator_->trajectory_->getKnotSO3(traj.first) = estimator_->trajectory_->getKnotSO3(traj.first + 1);
-            // }
-            // for (auto traj : estimator_->trajectory_info_) {
-            //     estimator_->trajectory_->getKnotPos(traj.second) = estimator_->trajectory_->getKnotPos(traj.second - 1);
-            //     estimator_->trajectory_->getKnotSO3(traj.second) = estimator_->trajectory_->getKnotSO3(traj.second - 1);
-            // }
             return ceres::SOLVER_CONTINUE;
         }
 

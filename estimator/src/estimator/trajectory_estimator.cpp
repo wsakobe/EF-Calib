@@ -48,25 +48,20 @@ void TrajectoryEstimator::addConvFeature(const corner_msgs::corner &corner, ros:
     // add intrinsic & distortion
     vec.emplace_back(convent_camera_->intrinsicParams);
     problem_1->AddParameterBlock(convent_camera_->intrinsicParams, 4);
-    //problem_1->SetParameterBlockConstant(vec.back());
     vec.emplace_back(convent_camera_->distortParams);
     problem_1->AddParameterBlock(convent_camera_->distortParams, 5);
-    //problem_1->SetParameterBlockConstant(vec.back());
 
     // add extrinsic
     vec.emplace_back(convent_camera_->R_C2W.data()); // 4 * 7 + 9 + 4
     problem_1->AddParameterBlock(vec.back(), 4, analytic_local_parameterization_);
-    //problem_1->SetParameterBlockConstant(vec.back());
     vec.emplace_back(convent_camera_->t_C2W.data()); // 4 * 7 + 9 + 7
     problem_1->AddParameterBlock(vec.back(), 3);
-    //problem_1->SetParameterBlockConstant(vec.back());
 
     // add time delay
     vec.emplace_back(&convent_camera_->time_delay); // 4 * 7 + 9 + 7 + 1 = 45 dims
     problem_1->AddParameterBlock(vec.back(), 1);
     problem_1->SetParameterLowerBound(&convent_camera_->time_delay, 0, -max_time_delay);
     problem_1->SetParameterUpperBound(&convent_camera_->time_delay, 0,  max_time_delay);
-    //problem_1->SetParameterBlockConstant(vec.back());
 
     problem_1->AddResidualBlock(cost_function_conv, new ceres::HuberLoss(2.0), vec);
 }
@@ -140,9 +135,6 @@ ceres::Solver::Summary TrajectoryEstimator::solve(int max_iterations = 50, bool 
     options.update_state_every_iteration = true;
     UpdateTrajectoryCallback callback(this);
     options.callbacks.push_back(&callback);
-    //options.function_tolerance = 1e-12;
-    //options.gradient_tolerance = 1e-12;
-    //options.parameter_tolerance = 1e-10;
 
     if (num_threads < 1){
         num_threads = 1; // std::thread::hardware_concurrency(); // mine is 8
@@ -150,12 +142,8 @@ ceres::Solver::Summary TrajectoryEstimator::solve(int max_iterations = 50, bool 
     options.num_threads = num_threads;
     options.max_num_iterations = max_iterations;
 
-    //trajectory_->print_knots();
-    
     ceres::Solver::Summary summary;
     ceres::Solve(options, problem_.get(), &summary);
-    
-    //trajectory_->print_knots();
 
     std::cout << summary.BriefReport() << std::endl;
 
@@ -171,8 +159,6 @@ ceres::Solver::Summary TrajectoryEstimator::solve1(int max_iterations = 50, bool
     options.minimizer_progress_to_stdout = progress;
     options.max_num_iterations = num_threads;
     options.logging_type = ceres::PER_MINIMIZER_ITERATION;
-    //options.function_tolerance = 1e-12;
-    //options.gradient_tolerance = 1e-12;
     options.parameter_tolerance = 1e-12;
 
     if (num_threads < 1){
@@ -184,8 +170,6 @@ ceres::Solver::Summary TrajectoryEstimator::solve1(int max_iterations = 50, bool
     ceres::Solver::Summary summary;
     ceres::Solve(options, problem_1.get(), &summary); //old
     
-    std::cout << convent_camera_->getExtrinsicMatrix() << std::endl;
-
     std::cout << summary.BriefReport() << std::endl;
 
     return summary;
