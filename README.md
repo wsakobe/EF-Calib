@@ -44,7 +44,7 @@ Build all the packages of EF-Calib.
 
 # Usage
 
-First, record the image data and event streams synchronized according to the method described in the paper.
+First, record the image data and event streams synchronized according to the method described in the paper. Alternatively, you can download an example rosbag from this [link](https://drive.google.com/file/d/1UXtpTBYqeFjvbvVHNQ-meKYFzR9RP7e2/view?usp=sharing) 
 
 Configure parameters in the `config/setup.yaml` file.
 
@@ -57,13 +57,13 @@ Configure parameters in the `config/setup.yaml` file.
   - `continue_number`: Minimum number of consecutive B-spline knots
   - `opt_time`: Total duration of the rosbag
 
-Next, run the following commands to extract feature information into corner_info.bag and circle_info.bag respectively. 
+Next, run the following commands to extract features from frames and events into `corner_info.bag` and `circle_info.bag`, respectively.
 
     $ source ../devel/setup.bash
     $ cd EF-Calib
     $ ./run.sh
 
-Finally, once valid feature bags are obtained, run the `estimator` to complete the calibration process.
+Once valid `corner_info.bag` and `circle_info.bag` files are obtained, run the estimator node to complete the calibration process. If successful, the calibration results will be displayed in the Terminal.
 
     $ roslaunch estimator estimator.launch
 
