@@ -74,11 +74,16 @@ This code was developed by [Shaoan Wang](https://wsakobe.github.io/) from Peking
 For researchers that have leveraged or compared to this work, please cite the following:
 
 ```latex
-@article{wang2024ef,
-  title={EF-Calib: Spatiotemporal Calibration of Event-and Frame-Based Cameras Using Continuous-Time Trajectories},
+@ARTICLE{10705060,
   author={Wang, Shaoan and Xin, Zhanhua and Hu, Yaoqing and Li, Dongyue and Zhu, Mingzhu and Yu, Junzhi},
-  journal={arXiv preprint arXiv:2405.17278},
-  year={2024}
+  journal={IEEE Robotics and Automation Letters}, 
+  title={EF-Calib: Spatiotemporal Calibration of Event- and Frame-Based Cameras Using Continuous-Time Trajectories}, 
+  year={2024},
+  volume={9},
+  number={11},
+  pages={10280-10287},
+  keywords={Cameras;Calibration;Trajectory;Splines (mathematics);Robot vision systems;Accuracy;Lighting;Spatiotemporal phenomena;Synchronization;Pattern recognition;Calibration and identification;sensor fusion;event camera;spatiotemporal calibration},
+  doi={10.1109/LRA.2024.3474475}
 }
 ```
 
